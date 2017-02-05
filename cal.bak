@@ -1,0 +1,255 @@
+<?php
+  include('session.php');
+
+  $id = $_POST['id'];
+  consolelog($id);
+    $opts = array('http' => array('header' => "User-Agent:MyAgent/1.0\r\n"));
+    $context = stream_context_create($opts);
+    $jsonString = file_get_contents('events.json', FALSE, $context);
+    $data = json_decode($jsonString,true);
+
+    //consolelog($data[events][5][date]);
+ 
+  function addEvent($type,$date,$title,$extra){
+   $length = count($data[$type]);
+
+        return;
+    $data[$type][$length][date] = $date;
+    $data[$type][$length][title] = $title;
+    $data[$type][$length][extra] = $extra;
+
+    $newJsonString = json_encode($data);
+    file_put_contents('events.json',$newJsonString);
+  }
+  function checkExistingDate($type,$date){
+    global $data;
+    $bool = false;
+
+    foreach ($data[$type] as $key => $entry){
+      if ($entry[date] == $date)
+        $bool = true;
+    }
+    return $bool;
+  }
+    function consolelog($data){
+    if (is_array( $data))
+      $output = "<script>console.log( 'Debug Objects: " . implode( ',', $data ) . "'  );</script>";
+    else
+      $output = "<script>console.log( 'Debug Objects: " . $data . "'  );</script>";
+    echo $output;
+  }
+  //addEvent("events",20170215,"ANOTHER","AA");
+  //if (checkExistingDate("events",2017021) == true)
+?>
+
+<!DOCTYPE html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><meta http-equiv="X-UA-Compatibe" content="IE=edge,chrome=1"><title>Sevaho Calendar</title><link rel="shortcut icon" href="favicon.png"><link rel="stylesheet" href="css/bootstrap.css"><link rel="stylesheet" href="css/calendar.css"><script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js">            </script><script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script></head><body><div id="calendar"></div>
+<div id="addeventform">
+  <form action="calendar.php">
+    <fieldset>
+      <legend>Adding an event</legend>
+      id: <br>
+      <input id="idofform" type = "text" name="id" value = "XXX"> <br>
+      Title:<br>
+      <input type="text" name="title" value="TODO"><br>
+      Extra:<br>
+      <input type="text" name="extra" value="TODO"><br><br>
+      <input type="submit" value="Submit">
+    </fieldset>
+  </form>
+  <button onclick="closeAddEventBox()">CLOSE</button>
+</div>
+
+<script>
+
+function closeAddEventBox(){
+  $("#addeventform").css('display','none')
+}
+
+$(window).ready(function(){
+
+
+  daysLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday'];
+  monthsLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var d = new Date();
+  var dayCounter; 
+  if (d.getDate() < 10){dayCounter = "0"+d.getDate();} else { dayCounter = d.getDate(); }
+  var monthCounter;
+  var monthCounterToday;
+  if ((d.getMonth()+1) < 10){
+    monthCounterToday = "0"+(d.getMonth()+1);
+    monthCounter = ""+(d.getMonth()+1);
+  } else { 
+    monthCounter = d.getMonth()+1; 
+    monthCounterToday = d.getMonth()+1; 
+  }
+  var yearCounter = d.getFullYear();
+  var today = yearCounter+''+monthCounterToday+''+dayCounter;
+
+  var cal = document.getElementById('calendar');
+  var containerMonth = document.createElement('div');
+  var containerDays = document.createElement('div');
+  containerDays.setAttribute('id','daysGrid');
+  var containerDates = document.createElement('div');
+  containerDates.setAttribute('id','datesGrid');
+
+  buildHeader();
+  buildGrid(monthCounter,yearCounter);
+  buttons(); 
+
+  function buildHeader(){
+    var monthX = document.createElement('div');
+    monthX.setAttribute('class','month');
+    var monthName = document.createElement('div');
+    monthName.setAttribute('id','month');
+    var buttonLeft = document.createElement('a');
+    buttonLeft.setAttribute('id','buttonLeft');
+    var buttonRight = document.createElement('a');
+    buttonRight.setAttribute('id','buttonRight');
+    monthX.appendChild(buttonLeft);
+    monthX.appendChild(buttonRight);
+    monthX.appendChild(monthName);
+    containerMonth.appendChild(monthX);
+    cal.appendChild(containerMonth);
+
+    for (i=0; i<daysLabels.length; i++){
+      var daysOfWeek = document.createElement('div');
+      daysOfWeek.setAttribute('class','dayOfTheWeek');
+      var day = document.createTextNode(daysLabels[i]);
+      daysOfWeek.appendChild(day); 
+      containerDays.appendChild(daysOfWeek);
+      cal.appendChild(containerDays);
+    }
+  }
+
+  function buildGrid(month, year){
+    document.getElementById('month').innerHTML = monthsLabels[monthCounter-1] + " " + yearCounter;
+    var firstDay = new Date(year, month-1, 1);
+             function daysInMonth(month,year) {
+      return new Date(year, month, 0).getDate();
+    }
+    var x = firstDay.getDay();
+    if (x == 0){
+      for (i=0;i<6;i++){
+        var days = document.createElement('div');
+        days.setAttribute('class', 'days Ndays');
+        containerDates.appendChild(days);
+        cal.appendChild(containerDates);
+      } 
+    }
+    while (x > 1){
+      var days = document.createElement('div');
+      days.setAttribute('class', 'days Ndays');
+      containerDates.appendChild(days);
+      cal.appendChild(containerDates);
+      x--;
+    }
+    if (month < 10){ month ="0"+month; }
+    for (i=1; i<=daysInMonth(month,year); i++){
+      var days = document.createElement('div');
+      if (i<10){i="0"+i;}
+      days.setAttribute('id', year+''+month+''+i);
+      days.setAttribute('class', 'days');
+      var day = document.createTextNode(i);
+      days.appendChild(day); 
+      containerDates.appendChild(days);
+      cal.appendChild(containerDates);
+    }
+
+    checkForEvents(); 
+    addEvent();
+  }
+
+  function addEvent(){
+    //jquery
+    $(".days").on('click',function(){
+      var id = $(this).attr('id');
+      if (id === undefined){
+        return;
+      } else{
+        console.log(id);
+        $("#addeventform").css('display','inline-block');
+        document.getElementById('idofform').value = id;
+
+      }
+    });
+  }
+
+  function checkForEvents(){
+    $.getJSON('events.json', function(data) {             
+      for (i=0;i<data.examens.length;i++){
+        $('#'+data.examens[i].date).addClass('examen');
+        $('#'+data.examens[i].date).append('<p>'+ data.examens[i].title+'</p>');
+        $('#'+data.examens[i].date).append('<p>'+ data.examens[i].hour+'</p>');
+        $('#'+data.examens[i].date).append('<p>'+ data.examens[i].extra+'</p>');
+      }
+      for (i=0;i<data.events.length;i++){
+        $('#'+data.events[i].date).addClass('event');
+        $('#'+data.events[i].date).append('<p>'+ data.events[i].title+'</p>');
+        $('#'+data.events[i].date).append('<p>'+ data.events[i].extra+'</p>');
+      } 
+      for (i=0;i<data.alerts.length;i++){
+        $('#'+data.alerts[i].date).addClass('alertX');
+        $('#'+data.alerts[i].date).append('<p>'+ data.alerts[i].title+'</p>');
+        $('#'+data.alerts[i].date).append('<p>'+ data.alerts[i].extra+'</p>');
+      }
+    });
+    $('#'+today).css('background-color','#272b33');
+    $('#'+today).css('color','white');
+    $('#datesGrid .days').each(function(){
+      id=$(this).attr('id');
+      if (id < today){
+    $('#'+id).css('opacity','0.4');
+      }
+    });
+    $('#datesGrid .Ndays').css('opacity','0.0');
+    
+  }
+
+  function clean(){
+    var container = document.getElementById('datesGrid');
+    while (container.firstChild) { container.removeChild(container.firstChild); } 
+  }
+  function goToPreviousMonth(e){ 
+    clean();   
+    monthCounter--;
+    if(monthCounter < 1){
+      monthCounter = 12;
+      yearCounter--;
+    }
+    buildGrid(monthCounter, yearCounter);
+  }
+  function goToNextMonth(){ 
+    clean();   
+    monthCounter++;
+    if (monthCounter > 12){
+      monthCounter = 1;
+      yearCounter++;
+    }
+    buildGrid(monthCounter, yearCounter);
+  }
+
+  function buttons(){
+    $('#buttonLeft').on('click', goToPreviousMonth );
+
+    $('#buttonRight').on('click', goToNextMonth );
+  }  
+
+  document.addEventListener("keydown", keyDownTextField, false);
+  function keyDownTextField(e) {
+    var keyCode = e.keyCode;
+    if(keyCode==37) {    
+      goToPreviousMonth();
+    } else if(keyCode==39){
+      goToNextMonth();
+    }
+  }
+  $("#calendar").on("swipeleft",function(){
+    goToNextMonth();
+  });
+  $("#calendar").on("swiperight",function(){
+    goToPreviousMonth();
+  });
+
+ 
+});
+</script></body></html>
