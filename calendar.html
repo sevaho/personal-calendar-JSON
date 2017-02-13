@@ -1,5 +1,5 @@
-<html lang="en"><head><meta name="viewport" content="width=device-width, initial scale=1"/><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><title>Click & Change Calendar</title><link rel="shortcut icon" href="favicon.png"/><link rel="stylesheet" href="css/bootstrap.css"/><link rel="stylesheet" href="css/calendar.css"/><!--link(rel='stylesheet',href='')--><script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script><script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script></head><body><div id="calendar"></div><div id="eventform"><form action="calendar.php"><fieldset><legend>Modify an event</legend><p>id:</p><input id="eventId" type="text" name="id" value="XXX"/><p>title:</p><input id="eventTitle" type="text" name="title" value="XXX"/><p>extra:</p><input id="eventExtra" type="text" name="extra" value="XXX"/></fieldset></form><button onclick="closeForm">close</button></div></body><script>function closeForm(){
-  $('#eventform').css('display','none')
+<html lang="en"><head><meta name="viewport" content="width=device-width, initial scale=1"/><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><title>Click & Change Calendar</title><link rel="shortcut icon" href="favicon.png"/><link rel="stylesheet" href="css/bootstrap.css"/><link rel="stylesheet" href="css/calendar.css"/><!--link(rel='stylesheet',href='')--><script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script><script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script></head><body><div id="calendar"></div><div id="form"><form id="eventform"><div class="field"><label>id:</label><input id="eventId" type="text" name="id"/></div><div class="field"><label>title:</label><input id="eventTitle" type="text" name="title" placeholder="title"/></div><div class="field"><label>extra:</label><input id="eventExtra" type="text" name="extra" placeholder="extra"/></div><div class="field"><button onclick="closeForm()">Close</button><button type="submit" value="Send">Submit</button></div></form></div></body><script>function closeForm(){
+  $("#form").css('display','none');
 }  
 //vars
 daysLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday']; 
@@ -20,11 +20,10 @@ function parseDateToString(date){
   return (years+''+months+''+days+''+weekdays)
 }
 
-var d = new Date();
-var dayCounter = date.getDate(); 
+var dayCounter = d.getDate(); 
 if (dayCounter < 10)
   dayCounter = ''+dayCounter;
-var monthCounter = (date.getMonth()+1);
+var monthCounter = (d.getMonth()+1);
 if (monthCounter < 10)
   monthCounter = '0'+monthCounter;
 var yearCounter = d.getFullYear();
@@ -68,6 +67,8 @@ function buildHeader(){
 }
 
 function buildGrid(month, year){
+  month=month*1;
+  console.log(month+" "+year);
   document.getElementById('month').innerHTML = monthsLabels[monthCounter-1] + " " + yearCounter;
   var firstDay = new Date(year, month-1, 1);
            function daysInMonth(month,year) {
@@ -113,8 +114,8 @@ function addEvent(){
       return;
     } else{
       console.log(id);
-      $("#addeventform").css('display','inline-block');
-      document.getElementById('idofform').value = id;
+      $("#form").css('display','inline-block');
+      document.getElementById('eventId').value = id;
 
     }
   });
@@ -194,4 +195,29 @@ $("#calendar").on("swipeleft",function(){
 });
 $("#calendar").on("swiperight",function(){
   goToPreviousMonth();
+});
+$(document).ready(function() { 
+  $('#eventform').submit(function(e) {
+    var id = $('#eventId').val()
+    var title = $('#eventTitle').val()
+    var extra = $('#eventExtra').val()
+    var url='calendar.php?id='+id+'?title='+title+'?extra='+extra
+    console.log(url);
+    $('#form').fadeOut(500);
+    $.ajax({
+      method:'POST',
+      url:'calendar.php?id='+id+'?title='+title+'?extra='+extra,
+      data:{
+
+      },
+      datatype:'json',
+      success:function(){
+        console.log('succes'); 
+        clean();
+        buildGrid(monthCounter, yearCounter);
+      }
+    });
+    e.preventDefault();
+    $(this).get(0).reset();
+  });
 });</script></html>

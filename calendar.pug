@@ -15,21 +15,24 @@ html(lang='en')
   
   body
     #calendar
-    #eventform
-      form(action='calendar.php')
-        fieldset
-          legend Modify an event
-          p id:
-          input(id='eventId',type='text',name='id',value='XXX')
-          p title:
-          input(id='eventTitle',type='text',name='title',value='XXX')
-          p extra:
-          input(id='eventExtra',type='text',name='extra',value='XXX')
-      button(onclick='closeForm') close
+    #form
+      form#eventform
+        .field
+          label id:
+          input(id='eventId',type='text',name='id')
+        .field
+          label title:
+          input(id='eventTitle',type='text',name='title',placeholder='title')
+        .field
+          label extra:
+          input(id='eventExtra',type='text',name='extra',placeholder='extra')
+        .field
+          button(onclick='closeForm()') Close
+          button(type='submit',value='Send') Submit
 
   script.
     function closeForm(){
-      $('#eventform').css('display','none')
+      $("#form").css('display','none');
     }  
     //vars
     daysLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday']; 
@@ -50,11 +53,10 @@ html(lang='en')
       return (years+''+months+''+days+''+weekdays)
     }
 
-    var d = new Date();
-    var dayCounter = date.getDate(); 
+    var dayCounter = d.getDate(); 
     if (dayCounter < 10)
       dayCounter = ''+dayCounter;
-    var monthCounter = (date.getMonth()+1);
+    var monthCounter = (d.getMonth()+1);
     if (monthCounter < 10)
       monthCounter = '0'+monthCounter;
     var yearCounter = d.getFullYear();
@@ -98,6 +100,8 @@ html(lang='en')
     }
 
     function buildGrid(month, year){
+      month=month*1;
+      console.log(month+" "+year);
       document.getElementById('month').innerHTML = monthsLabels[monthCounter-1] + " " + yearCounter;
       var firstDay = new Date(year, month-1, 1);
                function daysInMonth(month,year) {
@@ -143,8 +147,8 @@ html(lang='en')
           return;
         } else{
           console.log(id);
-          $("#addeventform").css('display','inline-block');
-          document.getElementById('idofform').value = id;
+          $("#form").css('display','inline-block');
+          document.getElementById('eventId').value = id;
 
         }
       });
@@ -224,4 +228,27 @@ html(lang='en')
     });
     $("#calendar").on("swiperight",function(){
       goToPreviousMonth();
+    });
+    $(document).ready(function() { 
+      $('#eventform').submit(function(e) {
+        var id = $('#eventId').val()
+        var title = $('#eventTitle').val()
+        var extra = $('#eventExtra').val()
+        $('#form').fadeOut(500);
+        $.ajax({
+          method:'POST',
+          url:'calendar.php?id='+id+'?title='+title+'?extra='+extra,
+          data:{
+
+          },
+          datatype:'json',
+          success:function(){
+            console.log('succes'); 
+            clean();
+            buildGrid(monthCounter, yearCounter);
+          }
+        });
+        e.preventDefault();
+        $(this).get(0).reset();
+      });
     });
