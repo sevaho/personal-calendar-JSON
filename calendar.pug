@@ -18,6 +18,9 @@ html(lang='en')
     #form
       form#eventform
         .field
+          label type:
+          input(id='eventType',type='text',name='type')
+        .field
           label id:
           input(id='eventId',type='text',name='id')
         .field
@@ -229,18 +232,18 @@ html(lang='en')
     $("#calendar").on("swiperight",function(){
       goToPreviousMonth();
     });
+
     $(document).ready(function() { 
       $('#eventform').submit(function(e) {
+        var type = $('#eventType').val()
         var id = $('#eventId').val()
         var title = $('#eventTitle').val()
         var extra = $('#eventExtra').val()
         $('#form').fadeOut(500);
         $.ajax({
           method:'POST',
-          url:'calendar.php?id='+id+'?title='+title+'?extra='+extra,
-          data:{
-
-          },
+          url:'calendar.php',
+          data: $("#eventform").serialize(),
           datatype:'json',
           success:function(){
             console.log('succes'); 
