@@ -18,8 +18,8 @@ html(lang='en')
     #form
       form#eventform
         .field
-          label type:(orange, green or normal)
-          input(id='eventType',type='text',name='type')
+          label color:(orange)
+          input(id='eventColor',type='text',name='color')
         .field
           label id:
           input(id='eventId',type='text',name='id')
@@ -27,8 +27,8 @@ html(lang='en')
           label title:
           input(id='eventTitle',type='text',name='title',placeholder='title')
         .field
-          label extra:
-          input(id='eventExtra',type='text',name='extra',placeholder='extra')
+          label description:
+          input(id='eventDescription',type='text',name='description',placeholder='description')
         .field
           button(onclick='closeForm()') Close
           button(type='submit',value='Send') Submit
@@ -160,20 +160,11 @@ html(lang='en')
 
     function checkForEvents(){
       $.getJSON('events.json', function(data) {             
-        for (i=0;i<data.orange.length;i++){
-          $('#'+data.orange[i].date).addClass('eventOrange');
-          $('#'+data.orange[i].date).append('<p>'+ data.orange[i].title+'</p>');
-          $('#'+data.orange[i].date).append('<p>'+ data.orange[i].extra+'</p>');
-        }
-        for (i=0;i<data.normal.length;i++){
-          $('#'+data.normal[i].date).addClass('eventNormal');
-          $('#'+data.normal[i].date).append('<p>'+ data.normal[i].title+'</p>');
-          $('#'+data.normal[i].date).append('<p>'+ data.normal[i].extra+'</p>');
-        } 
-        for (i=0;i<data.green.length;i++){
-          $('#'+data.green[i].date).addClass('eventGreen');
-          $('#'+data.green[i].date).append('<p>'+ data.green[i].title+'</p>');
-          $('#'+data.green[i].date).append('<p>'+ data.green[i].extra+'</p>');
+        for (i=0;i<data.events.length;i++){
+          $('#'+data.events[i].date).addClass('event');
+          $('#'+data.events[i].date).addClass(data.events[i].color);
+          $('#'+data.events[i].date).append('<p>'+ data.events[i].title+'</p>');
+          $('#'+data.events[i].date).append('<p>'+ data.events[i].description+'</p>');
         }
       });
       $('#'+dateID).css('background-color','#272b33');
@@ -235,10 +226,10 @@ html(lang='en')
 
     $(document).ready(function() { 
       $('#eventform').submit(function(e) {
-        var type = $('#eventType').val()
+        var color = $('#eventColor').val()
         var id = $('#eventId').val()
         var title = $('#eventTitle').val()
-        var extra = $('#eventExtra').val()
+        var description = $('#eventDescription').val()
         $('#form').fadeOut(500);
         $.ajax({
           method:'POST',

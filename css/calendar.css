@@ -19,10 +19,10 @@ a:hover { border: 0px; text-decoration: none; cursor: pointer; color: gray; }
 #buttonRight { float: Right; padding: 0% 0.7% 0% 1%; }
 #buttonRight:after {font-family: FontAwesome;content: '\f054'; }
 
-.eventGreen { background-color: #60bb22; color: white; }
+.event { background-color: #60bb22; color: white; }
+.orange { background-color: #FF5B00; color: white; }
 .days p:first-child { margin-top: 8px; }
 .days p { padding: 0px; margin: 0px; padding-left: 5%; }
-.eventOrange { background-color: #FF5B00; color: white; }
 #form { display: none; z-index: 5; width: 100%; height: 100%; background-color: rgba(87, 90, 100,0.7); position: absolute; top: 0%; left: 0%:  }
 #eventform { text-align: center; top: 10%; margin-top: 10%; }
 form .field { color: white; font-family: Roboto, serif; font-size: 1.2em; width: 100%;  }

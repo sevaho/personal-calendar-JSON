@@ -2,17 +2,18 @@
 
   //include('session.php');
 
-  $type = $_POST['type'];
+  $color = $_POST['color'];
   $id = $_POST['id'];
   $title = $_POST['title'];
-  $extra = nl2br($_POST['extra']);
+  $description = nl2br($_POST['description']);
 
   $opts = array('http' => array('header' => "User-Agent:MyAgent/1.0\r\n"));
   $context = stream_context_create($opts);
   $jsonString = file_get_contents('events.json', FALSE, $context);
   $data = json_decode($jsonString,true);
  
-  function addEvent($type,$date,$title,$extra){
+  function addEvent($color,$date,$title,$description){
+    $type = "events";
     global $data;
     $length = count($data[$type]);
 
@@ -21,12 +22,14 @@
       consolelog($nr);
       $data[$type][$nr][date] = $date;
       $data[$type][$nr][title] = $title;
-      $data[$type][$nr][extra] = $extra;
+      $data[$type][$nr][description] = $description;
+      $data[$type][$nr][color] = $color;
     }
     else {
       $data[$type][$length][date] = $date;
       $data[$type][$length][title] = $title;
-      $data[$type][$length][extra] = $extra;
+      $data[$type][$length][description] = $description;
+      $data[$type][$nr][color] = $color;
     }
 
     $newJsonString = json_encode($data);
@@ -65,8 +68,8 @@
     echo $output;
   }
 
-  //addEvent("alerts",20170214,"title","extra");
-  addEvent($type,$id,$title,$extra);
+  //addEvent("alerts",20170214,"title","description");
+  addEvent($color,$id,$title,$description);
 
   //if (checkExistingDate("events",2017021) == true)
 ?>
