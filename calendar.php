@@ -1,4 +1,5 @@
 <?php
+
   //include('session.php');
 
   $type = $_POST['type'];
