@@ -1,5 +1,5 @@
 - checks
 - UI
-- changing eventType also apply to different groups -> check each group
 - make it OO
-- removing events
+- colors
+- fix "loading" thing in left down corner

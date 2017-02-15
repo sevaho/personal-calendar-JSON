@@ -15,20 +15,20 @@
   function addEvent($color,$date,$title,$description){
     $type = "events";
     global $data;
-    $length = count($data[$type]);
+    $nr = count($data[$type]);
 
     if (checkExistingDate($type,$date) == true){
       $nr = giveNumberExistingDate($type,$date);
-      consolelog($nr);
+
       $data[$type][$nr][date] = $date;
       $data[$type][$nr][title] = $title;
       $data[$type][$nr][description] = $description;
       $data[$type][$nr][color] = $color;
     }
     else {
-      $data[$type][$length][date] = $date;
-      $data[$type][$length][title] = $title;
-      $data[$type][$length][description] = $description;
+      $data[$type][$nr][date] = $date;
+      $data[$type][$nr][title] = $title;
+      $data[$type][$nr][description] = $description;
       $data[$type][$nr][color] = $color;
     }
 
@@ -68,9 +68,8 @@
     echo $output;
   }
 
-  //addEvent("alerts",20170214,"title","description");
+  //addEvent("orange",20170215,"title","description");
   addEvent($color,$id,$title,$description);
 
-  //if (checkExistingDate("events",2017021) == true)
 ?>
 

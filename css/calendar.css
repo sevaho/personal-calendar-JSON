@@ -19,7 +19,7 @@ a:hover { border: 0px; text-decoration: none; cursor: pointer; color: gray; }
 #buttonRight { float: Right; padding: 0% 0.7% 0% 1%; }
 #buttonRight:after {font-family: FontAwesome;content: '\f054'; }
 
-.event { background-color: #60bb22; color: white; }
+.event { background-color: rgba(87, 90, 100,0.7); color: white; }
 .orange { background-color: #FF5B00; color: white; }
 .days p:first-child { margin-top: 8px; }
 .days p { padding: 0px; margin: 0px; padding-left: 5%; }
