@@ -1,18 +1,18 @@
-<html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"/><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><title>Click & Change Calendar</title><link rel="shortcut icon" href="favicon.png"/><link rel="stylesheet" href="css/bootstrap.css"/><link rel="stylesheet" href="css/calendar.css"/><!--link(rel='stylesheet',href='')--><script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script><script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script></head><body><div id="calendar"></div><div id="form"><form class="centered" id="eventform"><div class="field"><label>id:</label><input id="eventId" type="text" name="id"/></div><div class="field"><label>color:(orange)<!--input(id='eventColor',type='text',name='color')--></label><select name="color"><option value="orange">orange</option><option value="blue">blue</option><option value="red">red</option><option value="green">green</option><option value="normal">normal</option></select></div><div class="field"><label>title:</label><input id="eventTitle" type="text" name="title" placeholder="title"/></div><div class="field"><label>description:</label><input id="eventDescription" type="text" name="description" placeholder="description"/></div><div class="field"><button type="submit" value="Send">Submit</button></div></form></div></body><script>//Stop caching JSON
+<html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"/><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><title>Click & Change Calendar</title><link rel="shortcut icon" href="favicon.png"/><link rel="stylesheet" href="css/bootstrap.css"/><link rel="stylesheet" href="css/calendar.css"/><!--link(rel='stylesheet',href='')--><script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script><script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script></head><body><div id="calendar"><div id="gridMonths"><div id="month"></div><a id="buttonRight"></a><a id="buttonLeft"></a></div><div id="gridDays"></div><div id="gridEvents"></div></div><div id="form"><form class="centered" id="eventform"><div class="field"><label>id:</label><input id="eventId" type="text" name="id"/></div><div class="field"><label>color:<!--input(id='eventColor',type='text',name='color')--></label><select name="color"><option value="orange">orange</option><option value="blue">blue</option><option value="red">red</option><option value="green">green</option><option value="normal">normal</option></select></div><div class="field"><label>title:</label><input id="eventTitle" type="text" name="title" placeholder="title"/></div><div class="field"><label>description:</label><input id="eventDescription" type="text" name="description" placeholder="description"/></div><div class="field"><button type="submit" value="Send">Submit</button></div></form></div></body><script>//Stop caching JSON
 $.ajaxSetup({ cache: false });
 
 //Close eventform when clicking outside box
 $(document).click(function(event) { 
 	if(!$(event.target).closest('#eventform').length) {
-		if($('#form').is(":visible")) {
+		if($('#form').is(':visible')) {
 			$('#form').hide();
 		}
 	}				 
 });
 
 //vars
-daysLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday']; 
-monthsLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+LABEL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday']; 
+LABEL_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 var d = new Date();
 
@@ -39,93 +39,102 @@ var yearCounter = d.getFullYear();
 
 var dateID = yearCounter+''+monthCounter+''+dayCounter;
 
-//containers
-var cal = $('#calendar');
-var containerMonth = $('<div></div>');
-var containerDays = $('<div></div>');
-containerDays.attr('id','daysGrid');
-var containerDates = $('<div></div>');
-containerDates.attr('id','datesGrid');
 
-buildHeader();
-buildGrid(monthCounter,yearCounter);
-buttons(); 
+//buildHeader();
+//buildGrid(monthCounter,yearCounter);
+//buttons(); 
 
-function buildHeader(){
-	var monthX = $('<div></div>');
-	monthX.attr('class','month');
-	var monthName = $('<div></div>');
-	monthName.attr('id','month');
-	monthName.html(monthsLabels[monthCounter-1] + " " + yearCounter);
-	var buttonLeft = $('<a></a>');
-	buttonLeft.attr('id','buttonLeft');
-	var buttonRight = $('<a></a>');
-	buttonRight.attr('id','buttonRight');
-	monthX.append(buttonLeft);
-	monthX.append(buttonRight);
-	monthX.append(monthName);
-	containerMonth.append(monthX);
-	cal.append(containerMonth);
+//OBJECT ORIENTATED
+var gridMonths = function(){
+	var self = {}
+	self.grid = $('#gridMonths');
+	self.month = $('#month');
+	self.month.html(LABEL_MONTHS[monthCounter-1]+' '+yearCounter);
 
-	for (i=0; i<daysLabels.length; i++){
-		var daysOfWeek = $('<div></div>');
-		daysOfWeek.attr('class','dayOfTheWeek');
-		var day = $(document.createTextNode(daysLabels[i]));
-		daysOfWeek.append(day); 
-		containerDays.append(daysOfWeek);
-		cal.append(containerDays);
+	self.update = function(){
+		self.month.html(LABEL_MONTHS[monthCounter-1]+' '+yearCounter);
 	}
+	self.buttons = function(){
+		$('#buttonLeft').on('click', goToPreviousMonth );
+		$('#buttonRight').on('click', goToNextMonth );
+	}
+	var activateButtons = self.buttons();
+	return self;
 }
 
-function buildGrid(month, year){
-	month=month*1;
-	$('#month').html(monthsLabels[monthCounter-1] + " " + yearCounter);
-	var firstDay = new Date(year, month-1, 1);
-	function daysInMonth(month,year) {
-		return new Date(year, month, 0).getDate();
+var gridDays = function(){
+	var self = {};
+	self.grid = $('#gridDays');
+	self.createDaysLabels = function(){
+		LABEL_DAYS.forEach(function(item){
+			daysOfWeek = $('<div></div>');
+			daysOfWeek.attr('class','dayOfTheWeek');
+			day = $(document.createTextNode(item));
+			daysOfWeek.append(day); 
+			$('#gridDays').append(daysOfWeek);
+		});
 	}
-	var x = firstDay.getDay();
-	if (x == 0){
-		for (i=0;i<6;i++){
+	var daysLabel = self.createDaysLabels();
+	return self;
+}
+var gridEvents = function(){
+	var self = {}
+	self.grid = $('#gridEvents');
+	
+	self.update = function(){
+		self.draw();
+
+	}
+	self.draw = function(){
+		var year = yearCounter;
+		var month = monthCounter;
+		var daysInMonth = new Date(year, month, 0).getDate();
+		var firstDayBeginning = new Date(year, month-1, 1).getDay();
+
+		if (firstDayBeginning == 0){
+			for (i=0;i<6;i++){
+				var days = $('<div></div>');
+				days.attr('class', 'days Ndays');
+				self.grid.append(days);
+			}
+		}
+		while (firstDayBeginning > 1){
 			var days = $('<div></div>');
 			days.attr('class', 'days Ndays');
-			containerDates.append(days);
-			cal.append(containerDates);
-		} 
-	}
-	while (x > 1){
-		var days = $('<div></div>');
-		days.attr('class', 'days Ndays');
-		containerDates.append(days);
-		cal.append(containerDates);
-		x--;
-	}
-	if (month < 10){ month ="0"+month; }
-	for (i=1; i<=daysInMonth(month,year); i++){
-		var days = $('<div></div>');
-		if (i<10){i="0"+i;}
-		days.attr('id', year+''+month+''+i);
-		days.attr('class', 'days');
-		var day = document.createTextNode(i);
-		days.append(day); 
-		containerDates.append(days);
-		cal.append(containerDates);
-	}
+			self.grid.append(days);
+			firstDayBeginning--;
+		}
 
-	checkForEvents(); 
-	addEvent();
+		for (i=1; i<=daysInMonth; i++){
+			var days = $('<div></div>');
+			days.attr('class', 'days');
+			if (i<10){i='0'+i;}
+			days.attr('id', year+''+month+''+i);
+			self.grid.append(days);
+			var day = document.createTextNode(i);
+			days.append(day); 
+		}
+		checkForEvents(); 
+		addEventForm();
+	}
+	var drawGrid = self.draw();
+
+	return self;
 }
 
-function addEvent(){
+
+
+function addEventForm(){
 	//jquery
-	$(".days").on('click',function(e){
+	$('.days').on('click',function(e){
 		e.preventDefault();
 		var id = $(this).attr('id');
 		if (id === undefined){
 			return;
+			console.log("id is undefined");
 		} else{
 			console.log(id);
-			$("#form").fadeIn(300,function(){$(this).focus();});
+			$('#form').fadeIn(300,function(){$(this).focus();});
 			document.getElementById('eventId').value = id;
 
 		}
@@ -143,10 +152,10 @@ function checkForEvents(){
 	});
 	$('#'+dateID).css('background-color','#272b33');
 	$('#'+dateID).css('color','white');
-	$('#datesGrid .days').each(function(){
+	$('#gridEvents .days').each(function(){
 		id=$(this).attr('id');
 		if (id < dateID){
-	$('#'+id).css('opacity','0.4');
+			$('#'+id).css('opacity','0.4');
 		}
 	});
 	$('#datesGrid .Ndays').css('opacity','0.0');
@@ -154,35 +163,32 @@ function checkForEvents(){
 }
 
 function clean(){
-	var container = document.getElementById('datesGrid');
+	var container = document.getElementById('gridEvents');
 	while (container.firstChild) { container.removeChild(container.firstChild); } 
 }
+
 function goToPreviousMonth(){ 
 	clean();	 
 	monthCounter--;
+	monthCounter = '0'+monthCounter;
 	if(monthCounter < 1){
 		monthCounter = 12;
 		yearCounter--;
 	}
-	buildGrid(monthCounter, yearCounter);
+	updateAll();
 }
 function goToNextMonth(){ 
 	clean();	 
 	monthCounter++;
+	monthCounter = '0'+monthCounter;
 	if (monthCounter > 12){
-		monthCounter = 1;
+		monthCounter = 01;
 		yearCounter++;
 	}
-	buildGrid(monthCounter, yearCounter);
+	updateAll();
 }
 
-function buttons(){
-	$('#buttonLeft').on('click', goToPreviousMonth );
-
-	$('#buttonRight').on('click', goToNextMonth );
-}  
-
-document.addEventListener("keydown", keyDownTextField, false);
+document.addEventListener('keydown', keyDownTextField, false);
 function keyDownTextField(e) {
 	var keyCode = e.keyCode;
 	if(keyCode==37) {		 
@@ -191,32 +197,35 @@ function keyDownTextField(e) {
 		goToNextMonth();
 	}
 }
-$("#calendar").on("swipeleft",function(){
+$('#calendar').on('swipeleft',function(){
 	goToNextMonth();
 });
-$("#calendar").on("swiperight",function(){
+$('#calendar').on('swiperight',function(){
 	goToPreviousMonth();
 });
 
 $(document).ready(function() { 
-	$('#eventform').submit(function(e) {
-		var color = $('#eventColor').val()
-		var id = $('#eventId').val()
-		var title = $('#eventTitle').val()
-		var description = $('#eventDescription').val()
+	$('#eventform').submit(function(e){
 		$('#form').fadeOut(500);
 		$.ajax({
 			method:'POST',
 			url:'calendar.php',
-			data: $("#eventform").serialize(),
+			data: $('#eventform').serialize(),
 			datatype:'json',
 			success:function(){
-				console.log('succes'); 
 				clean();
-				buildGrid(monthCounter, yearCounter);
+				updateAll();
 			}
 		});
 		e.preventDefault();
 		$(this).get(0).reset();
 	});
-});</script></html>
+});
+function updateAll(){
+	m.update();
+	e.update();
+}
+
+var m = new gridMonths();
+var d = new gridDays();
+var e = new gridEvents();</script></html>
