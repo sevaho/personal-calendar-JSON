@@ -15,6 +15,12 @@ html(lang='en')
 	
 	body
 		#calendar
+      #gridMonths
+        a#buttonLeft
+        #monthName
+        a#buttonRight
+      #gridDays
+      #gridEvents
 		#form
 			form#eventform.centered
 				.field
@@ -53,8 +59,8 @@ html(lang='en')
 		});
 
 		//vars
-		daysLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday']; 
-		monthsLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		LABEL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday']; 
+		LABEL_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 		var d = new Date();
 
@@ -81,47 +87,34 @@ html(lang='en')
 
 		var dateID = yearCounter+''+monthCounter+''+dayCounter;
 
-		//containers
-		var cal = $('#calendar');
-		var containerMonth = $('<div></div>');
-		var containerDays = $('<div></div>');
-		containerDays.attr('id','daysGrid');
-		var containerDates = $('<div></div>');
-		containerDates.attr('id','datesGrid');
 
 		buildHeader();
 		buildGrid(monthCounter,yearCounter);
 		buttons(); 
 
-		function buildHeader(){
-			var monthX = $('<div></div>');
-			monthX.attr('class','month');
-			var monthName = $('<div></div>');
-			monthName.attr('id','month');
-			monthName.html(monthsLabels[monthCounter-1] + " " + yearCounter);
-			var buttonLeft = $('<a></a>');
-			buttonLeft.attr('id','buttonLeft');
-			var buttonRight = $('<a></a>');
-			buttonRight.attr('id','buttonRight');
-			monthX.append(buttonLeft);
-			monthX.append(buttonRight);
-			monthX.append(monthName);
-			containerMonth.append(monthX);
-			cal.append(containerMonth);
+    //OO
+    var gridMonths = function(){
+    }
 
-			for (i=0; i<daysLabels.length; i++){
+		function buildHeader(){
+      var month = $('#monthName')
+      var containerDates = $('#gridEvents')
+			month.html(LABEL_MONTHS[monthCounter-1] + " " + yearCounter);
+
+			for (i=0; i<LABEL_DAYS.length; i++){
+        var gridDays = $('#gridDays');
 				var daysOfWeek = $('<div></div>');
 				daysOfWeek.attr('class','dayOfTheWeek');
-				var day = $(document.createTextNode(daysLabels[i]));
+				var day = $(document.createTextNode(LABEL_DAYS[i]));
 				daysOfWeek.append(day); 
-				containerDays.append(daysOfWeek);
-				cal.append(containerDays);
+				gridDays.append(daysOfWeek);
 			}
 		}
 
 		function buildGrid(month, year){
 			month=month*1;
-			$('#month').html(monthsLabels[monthCounter-1] + " " + yearCounter);
+      var month = $('#monthName')
+			month.html(LABEL_MONTHS[monthCounter-1] + " " + yearCounter);
 			var firstDay = new Date(year, month-1, 1);
 			function daysInMonth(month,year) {
 				return new Date(year, month, 0).getDate();
@@ -132,14 +125,12 @@ html(lang='en')
 					var days = $('<div></div>');
 					days.attr('class', 'days Ndays');
 					containerDates.append(days);
-					cal.append(containerDates);
 				} 
 			}
 			while (x > 1){
 				var days = $('<div></div>');
 				days.attr('class', 'days Ndays');
 				containerDates.append(days);
-				cal.append(containerDates);
 				x--;
 			}
 			if (month < 10){ month ="0"+month; }
@@ -151,7 +142,6 @@ html(lang='en')
 				var day = document.createTextNode(i);
 				days.append(day); 
 				containerDates.append(days);
-				cal.append(containerDates);
 			}
 
 			checkForEvents(); 
@@ -242,10 +232,6 @@ html(lang='en')
 
 		$(document).ready(function() { 
 			$('#eventform').submit(function(e) {
-				var color = $('#eventColor').val()
-				var id = $('#eventId').val()
-				var title = $('#eventTitle').val()
-				var description = $('#eventDescription').val()
 				$('#form').fadeOut(500);
 				$.ajax({
 					method:'POST',
@@ -253,7 +239,6 @@ html(lang='en')
 					data: $("#eventform").serialize(),
 					datatype:'json',
 					success:function(){
-						console.log('succes'); 
 						clean();
 						buildGrid(monthCounter, yearCounter);
 					}

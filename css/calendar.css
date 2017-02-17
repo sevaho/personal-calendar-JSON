@@ -10,7 +10,6 @@ body { height: 100%; width: 100%; font-family: 'Roboto', Helvetica, Arial, sans-
 .days { font-size: 0.9em; color: #eee; border: 1px solid #878787; width: 14.3557%; height: 112px; display: inline-block; vertical-align: top; padding-left: 5px; padding-top: 5px;  margin: -1px -0px -0px -1px; background-color: rgba(87, 90, 100,0.7);}
 .month {  color: white; width: 90%; text-align: center; font-size: 3em; margin-left: auto; margin-right: auto; float: none;  margin-top: 2%; letter-spacing: 1px; text-transform: uppercase;  font-weight: 500;  }
 .dayOfTheWeek { color: white; width: 14.3557%; display: inline-block; padding: 9px 0px 5px 0px; font-size: 1.2em; text-align: center;  margin: 2% -1px 3%  -1px; text-transform: uppercase; }
-.ex { background-color: cyan; }
 .Ndays { display: inline-block; border: 2px solid white; opacity: 0;  }
 a { border: 0px; text-decoration: none; cursor: pointer; color: white; }
 a:hover { border: 0px; text-decoration: none; cursor: pointer; color: gray; }
