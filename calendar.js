@@ -19,7 +19,7 @@ var d = new Date();
 //Counters
 var dayCounter = d.getDate(); 
 if (dayCounter < 10)
-  dayCounter = ''+dayCounter;
+  dayCounter = '0'+dayCounter;
 var monthCounter = (d.getMonth()+1);
 if (monthCounter < 10)
   monthCounter = '0'+monthCounter;
