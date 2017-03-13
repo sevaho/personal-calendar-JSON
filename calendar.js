@@ -154,7 +154,8 @@ function clean(){
 function goToPreviousMonth(){ 
   clean();	 
   monthCounter--;
-  monthCounter = '0'+monthCounter;
+  if (monthCounter < 10)
+    monthCounter = '0'+monthCounter;
   if(monthCounter < 1){
     monthCounter = 12;
     yearCounter--;
@@ -164,7 +165,8 @@ function goToPreviousMonth(){
 function goToNextMonth(){ 
   clean();	 
   monthCounter++;
-  monthCounter = '0'+monthCounter;
+  if (monthCounter < 10)
+    monthCounter = '0'+monthCounter;
   if (monthCounter > 12){
     monthCounter = 01;
     yearCounter++;
